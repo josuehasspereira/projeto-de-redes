@@ -5,7 +5,7 @@
 #include <PubSubClient.h>
 #include <WiFi.h>
 
-// WiFi e MQTT
+// Variáveis para WIFI e MQTT
 const char* ssid = "CLARO_2G590AE4";
 const char* password = "g1T#4bR3_p(";
 const char* mqtt_server = "179.222.233.198";
@@ -17,7 +17,6 @@ const char* mqtt_topic = "localizacao";
 WiFiClient espClient;
 PubSubClient client(espClient);
 
-// BLE
 BLEScan* pBLEScan;
 int numDispositivos = 0;
 float distanciaTotal = 0;
@@ -31,14 +30,14 @@ class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
 void setup() {
   Serial.begin(115200);
 
-  // Inicialização WiFi
+  // Conexão para o WIFI
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.println("Conectando ao WiFi...");
   }
 
-  // Inicialização MQTT
+  // Conexão MQTT (arrumar...)
   client.setServer(mqtt_server, mqtt_port);
   while (!client.connected()) {
     Serial.println("Conectando ao servidor MQTT...");
@@ -52,7 +51,7 @@ void setup() {
     }
   }
 
-  // Inicialização BLE
+  // Conexão BLE
   BLEDevice::init("");
   pBLEScan = BLEDevice::getScan(); 
   pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
@@ -84,9 +83,9 @@ void loop() {
   delay(2000);
 }
 
+// Calular distância dos dispositivos próximos
 float calcularDistancia(int rssi) {
-  // Implemente seu cálculo de distância aqui
-  // Este é apenas um exemplo simples
+  // Alterar fórmula
   float distancia = 10 - (rssi / 10.0); // Simulação de um cálculo de distância
   return distancia;
 }
