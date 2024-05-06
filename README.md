@@ -20,8 +20,8 @@ git clone https://github.com/seu-usuario/nome-do-repositorio.git
 3. Abra o arquivo `esp.ino` no Arduino IDE.
 
 4. Certifique-se de ter instalado as bibliotecas necessárias:
-   - `BLEDevice`: Para comunicação Bluetooth Low Energy.
-   - `PubSubClient`: Para comunicação MQTT.
+   - `ArduinoMqttClient de Arduino`: Para permitir que os usuários usem recursos de rede como rest e mqtt.
+   - `PubSubClient de Nick O'Leary`: Para comunicação MQTT.
 
    Você pode instalar essas bibliotecas no Arduino IDE indo em `Sketch -> Incluir Biblioteca -> Gerenciar Bibliotecas`, e pesquisando pelos nomes das bibliotecas.
 
