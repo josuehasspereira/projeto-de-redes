@@ -25,7 +25,12 @@ git clone https://github.com/seu-usuario/nome-do-repositorio.git
 
    Você pode instalar essas bibliotecas no Arduino IDE indo em `Sketch -> Incluir Biblioteca -> Gerenciar Bibliotecas`, e pesquisando pelos nomes das bibliotecas.
 
-5. Configure as credenciais do seu WiFi e do seu servidor MQTT no código, nas seguintes linhas:
+5. Configuração de Ferramentas:
+   - Vá em `Ferramentas -> Upload Speed` e certifique-se que está configurado para `115200`, caso não esteja, altere para o mesmo!
+   - Vá em `Ferramentas -> Partition Scheme` e altere para a opção `HugeApp`
+   
+
+7. Configure as credenciais do seu WiFi e do seu servidor MQTT no código, nas seguintes linhas:
 
 ```cpp
 const char* ssid = "SEU_SSID";
