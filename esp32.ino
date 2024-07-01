@@ -9,47 +9,53 @@
 // Variáveis para WIFI e MQTT
 const char* ssid = "CLARO_2G590AE4";
 const char* password = "g1T#4bR3_p(";
-const char* mqtt_server = "broker.emqx.io"; // Alterado para o servidor MQTT público
+const char* mqtt_server = "broker.emqx.io"; // Usando Servidor público
 const int mqtt_port = 1883;
-const char* mqtt_topic = "localizacao";
+const char* mqtt_topic = "localizacao"; //Usar mesmo topico para transmitir mensagens mqtt
 
 // Inicialização do Cliente
 WiFiClient espClient;
 PubSubClient client(espClient);
 
 BLEScan* pBLEScan;
+int numDispositivos = 0;
 
 // Variáveis do modelo de perda de caminho livre na propagação de sinais de rádio
 const int rssi_ref = -69; 
-const float N = 2.0; 
+const float N = 2; 
 
-// Declaração das funções para envio de mensagem do mqtt e calculo da distanca
+//Funções para envio de mensagem do mqtt e cálculo da distância
 float calcularDistancia(int rssi);
-void enviarMensagemMQTT(int numDispositivos, float distancia);
+void enviarMensagemMQTT(int numDispositivos, const char* name, const char* address, int rssi, float distancia);
 
 class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
     void onResult(BLEAdvertisedDevice advertisedDevice) {
+        numDispositivos++;
         std::string name = advertisedDevice.getName();
-        if (name.empty()) {
-            name = "N/A"; // Nome não disponível
-        }
-        Serial.printf("Advertised Device: Name: %s, Address: %s, rssi: %d\n", name.c_str(), advertisedDevice.getAddress().toString().c_str(), advertisedDevice.getRSSI());
-        float distancia = calcularDistancia(advertisedDevice.getRSSI());
-        enviarMensagemMQTT(1, distancia);
+        std::string address = advertisedDevice.getAddress().toString();
+        int rssi = advertisedDevice.getRSSI();
+        float distancia = calcularDistancia(rssi);
+
+        // Exibe informações do dispositivo
+        Serial.printf("Advertised Device \nName: %s \nAddress: %s \nrssi: %d\n", name.c_str(), address.c_str(), rssi);
         Serial.print("Distância: ");
         Serial.println(distancia);
+        // Chama a função para enviar a mensangem MQTT - Exibida no celular
+        enviarMensagemMQTT(numDispositivos, name.c_str(), address.c_str(), rssi, distancia);
     }
 };
-
 
 void setup() {
   Serial.begin(115200);
 
-  // Conexão para o WIFI
+  // Faz a Conexão para o WIFI
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.println("Conectando ao WiFi...");
+  }
+  if (WiFi.status() == WL_CONNECTED) {
+    Serial.println("Conectado ao Wifi Com Sucesso!");
   }
 
   // Faz a Conexão MQTT usando o servidor broker.emqx.io
@@ -57,7 +63,13 @@ void setup() {
   while (!client.connected()) {
     Serial.println("Conectando ao servidor MQTT...");
     if (client.connect("")) {
-      Serial.println("Conectado ao servidor MQTT");
+      Serial.println("Conectado ao servidor MQTT\n");
+      
+      // Exibe as infos de config
+      char infoMessage[256];
+      snprintf(infoMessage, 256, "IP do ESP32: %s \nIP do broker: %s \nPorta do broker: %d", 
+               WiFi.localIP().toString().c_str(), mqtt_server, mqtt_port);
+      client.publish(mqtt_topic, infoMessage);
     } else {
       Serial.print("Falha na conexão com o servidor MQTT, rc=");
       Serial.print(client.state());
@@ -65,6 +77,15 @@ void setup() {
       delay(5000);
     }
   }
+
+  Serial.print("-----------------------------------------\n");
+  Serial.print("IP do ESP32: ");
+  Serial.println(WiFi.localIP());
+  Serial.print("IP do broker: ");
+  Serial.println(mqtt_server);
+  Serial.print("Porta do broker: ");
+  Serial.println(mqtt_port);
+  Serial.print("-----------------------------------------\n\n");
 
   // Conexão BLE
   BLEDevice::init("");
@@ -75,9 +96,13 @@ void setup() {
 }
 
 void loop() {
+  numDispositivos = 0; // Reinicia o contador de dispositivos a cada loop
   pBLEScan->start(1); // Não é necessário armazenar o resultado do escaneamento
-
   delay(2000); // Tempo de loop do scanner
+
+  // Exibe a quantidade de dispositivos encontrados
+  Serial.printf("Quantidade de dispositivos encontrados: %d\n", numDispositivos);
+  Serial.print("-----------------------------------------\n\n");
 }
 
 // Calcula a distância dos dispositivos próximos usando a fórmula do modelo de caminho livre
@@ -86,9 +111,10 @@ float calcularDistancia(int rssi) {
   return distancia;
 }
 
-//Envia a mensagen mqtt 
-void enviarMensagemMQTT(int numDispositivos, float distancia) {
-  char message[100];
-  snprintf(message, 100, "{\"num_dispositivos\": %d, \"distancia\": %.2f}", numDispositivos, distancia);
+// Envia a mensagem MQTT
+void enviarMensagemMQTT(int numDispositivos, const char* name, const char* address, int rssi, float distancia) {
+  char message[256];
+  snprintf(message, 256, "Dispositivos: %d Nome: %s MAC: %s RSSI: %d Distância: %.2f", 
+           numDispositivos, name, address, rssi, distancia);
   client.publish(mqtt_topic, message);
 }
