@@ -2,6 +2,8 @@
 Adaptado de:
 ESP32 BLE Scanner Example. Disponível em: <
 https://github.com/nkolban/ESP32_BLE_Arduino/tree/master/examples/BLE_scan >
+
+Artigo Referência: Indoor Localization in BLE using Mean and Median Filtered RSSI Values - (Venkatesh.R, Vikas Mittal, Hrudaya Tammana)
 */
 
 #include <Arduino.h>
