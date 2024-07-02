@@ -60,3 +60,9 @@ const char* mqtt_password = "SENHA_MQTT";
 
 Este projeto permite monitorar dispositivos BLE em tempo real e enviar essas informações para um servidor MQTT. Você pode visualizar os dados usando um cliente MQTT no seu computador ou dispositivo móvel. Certifique-se de seguir todos os passos de configuração e de ter as bibliotecas necessárias instaladas no Arduino IDE.
 
+
+# Referências
+Código Adaptado de: ESP32 BLE Scanner Example. Disponível em: <https://github.com/nkolban/ESP32_BLE_Arduino/tree/master/examples/BLE_scan >
+
+Artigo Referência: Indoor Localization in BLE using Mean and Median Filtered RSSI Values - (Venkatesh.R, Vikas Mittal, Hrudaya Tammana)
+
